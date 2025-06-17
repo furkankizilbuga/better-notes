@@ -1,11 +1,9 @@
-// electron/main.js
 import { app, BrowserWindow } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// Geliştirme ortamını kontrol et
 const isDev = process.env.NODE_ENV === 'development'
 
 let mainWindow
