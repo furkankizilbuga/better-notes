@@ -22,13 +22,9 @@ const editorProps = {
 type TiptapEditorProps = {
 	setNotePayload: Dispatch<SetStateAction<NotePayload | null>>;
 	notePayload?: NotePayload | null;
-	from?: 'new'
 }
 
-const TiptapEditor = ({ setNotePayload, notePayload, from }: TiptapEditorProps) => {
-	if (from !== 'new' && !notePayload?.content) {
-		return <div>Loading...</div>
-	}
+const TiptapEditor = ({ setNotePayload, notePayload }: TiptapEditorProps) => {
 	return (
 		<EditorProvider
 			slotBefore={<EditorMenu />}
