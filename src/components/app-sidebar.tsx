@@ -1,4 +1,5 @@
 import { Home, Inbox } from "lucide-react"
+import { Link } from "@tanstack/react-router"
 
 import {
   Sidebar,
@@ -14,17 +15,18 @@ import {
 const items = [
   {
     title: "Home",
-    url: "#",
+    path: "/",
     icon: Home,
   },
   {
     title: "My Notes",
-    url: "#",
+    path: "/editor",
     icon: Inbox,
   },
 ]
 
 export function AppSidebar() {
+  //TODO: Açılış ve kapanış akıcı değil.
   return (
     <Sidebar>
       <SidebarContent>
@@ -34,10 +36,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link to={item.path}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

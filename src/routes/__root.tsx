@@ -9,6 +9,7 @@ function RootComponent() {
     return (
         <Layout>
             <Link to="/"></Link>
+            <Link to="/notes"></Link>
             <Outlet />
         </Layout>
     )

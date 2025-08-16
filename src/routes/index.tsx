@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Container } from '@/components/ui/container'
 import { Separator } from '@/components/ui/separator'
 import { TypographyH1 } from '@/components/ui/typography-h1'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({
     component: RouteComponent,
@@ -15,7 +15,12 @@ function RouteComponent() {
             
             <Container className='flex flex-col gap-4 items-center'>
                 <TypographyH1>Better Notes</TypographyH1>
-                <Button className='max-w-52 w-full' size={'lg'}>Yaz</Button>
+                <Link to='/notes' className='max-w-52 w-full'>
+                    <Button className='w-full' size={'lg'}>Yaz</Button>
+                </Link>
+                <Link to='/short-notes' className='max-w-52 w-full'>
+                    <Button className='w-full' size={'lg'}>Kısa</Button>
+                </Link>
             </Container>
             
             <Separator></Separator>
