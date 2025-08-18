@@ -5,12 +5,28 @@ import { Separator } from '@/components/ui/separator'
 import { TypographyH1 } from '@/components/ui/typography-h1'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Route as NotesRoute } from '@/routes/notes/$noteIdOrNew'
+import { useEffect, useState } from 'react'
+import type { Note } from '@/types/note'
+import { GetAllNotes } from '@/services/note-service'
 
 export const Route = createFileRoute('/')({
     component: RouteComponent,
 })
 
 function RouteComponent() {
+    const [notes, setNotes] = useState<Note[]>([]);
+
+    useEffect(() => {
+        GetAllNotes()
+            .then((res) => {
+                setNotes(res);
+            })
+            .catch((err) => {
+                console.error(err);
+                setNotes([]);
+            })
+    }, [])
+    
     return (
         <Container className='flex flex-col gap-4 justify-center items-center h-full'>
             
@@ -27,9 +43,11 @@ function RouteComponent() {
             <Separator></Separator>
             
             <Container className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
-                <NoteCard />
-                <NoteCard />
-                <NoteCard />
+                {
+                    notes.map((note: Note) => (
+                        <NoteCard key={note.id} note={note} />
+                    ))
+                }
             </Container>
 
         </Container>

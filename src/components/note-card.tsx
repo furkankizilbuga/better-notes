@@ -5,12 +5,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import type { Note } from "@/types/note"
 
-export const NoteCard = () => {
+type TProps = {
+    note: Note
+}
+
+export const NoteCard = ({ note }: TProps) => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Card Title</CardTitle>
+                <CardTitle>{note.title}</CardTitle>
                 <CardDescription>Card Description</CardDescription>
             </CardHeader>
             <CardContent>

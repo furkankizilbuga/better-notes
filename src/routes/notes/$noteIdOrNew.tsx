@@ -38,10 +38,9 @@ function RouteComponent() {
 		if (noteIdOrNew === 'new' || isFromNew.current) return;
 		GetNoteById(Number(noteIdOrNew))
 			.then((res) => {
-				const note = res.data
 				setNotePayload({
-					title: note.title || '',
-					content: JSON.parse(note.content),
+					title: res.title || '',
+					content: res.content,
 				})
 			})
 			.catch((err) => console.error('Could not fetch note:', err))
