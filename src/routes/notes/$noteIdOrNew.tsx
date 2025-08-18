@@ -3,7 +3,8 @@ import { Container } from '@/components/ui/container'
 import { Input } from '@/components/ui/input'
 import { useDebounce } from '@/hooks/use-debounce'
 import { CreateNote, GetNoteById, UpdateNoteById } from '@/services/note-service'
-import type { NotePayload } from '@/types/note'
+import type { Note, NotePayload } from '@/types/note'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 
@@ -14,45 +15,70 @@ export const Route = createFileRoute('/notes/$noteIdOrNew')({
 const AUTO_UPDATE_DELAY = 1000;
 
 function RouteComponent() {
-	const { noteIdOrNew } = useParams({ from: '/notes/$noteIdOrNew' })
 	const [notePayload, setNotePayload] = useState<NotePayload | null>(null)
+	const { noteIdOrNew } = useParams({ from: '/notes/$noteIdOrNew' })
+ 
+	// Hızlı karakter girdiğimizde arka arkada create yapmasın diye flag.
+	const isCreating = useRef(false);
+
 	const debouncedNote = useDebounce(notePayload, AUTO_UPDATE_DELAY)
 	const navigate = useNavigate();
-	const isFromNew = useRef(false);
+	const queryClient = useQueryClient();
+
+	// CreateNote
+	const createNoteMutation = useMutation({
+		mutationFn: CreateNote,
+		onSuccess: (res) => {
+			const note = res.data;
+			// TODO: invalidateQueries
+			queryClient.refetchQueries({ queryKey: ['notes'] });
+			navigate({ to: `/notes/${note.id}`, replace: true })
+		}
+	})
+
+	// UpdateNoteById
+	const updateNoteMutation = useMutation({
+		mutationFn: ({ note, noteId }: { note: NotePayload, noteId: number }) => {
+			return UpdateNoteById(note, noteId)
+		},
+		onSuccess: (res) => {
+			const updatedNote = res.data;
+			queryClient.setQueryData<Note[]>(['notes'], (oldNotes = []) => (
+				oldNotes.map(note => (
+					note.id === updatedNote.id
+						? { ...updatedNote, content: JSON.parse(updatedNote.content) }
+						: note
+				))
+			))
+		}
+	})
+
+	// GetNoteById
+	const { data: note } = useQuery<Note>({
+		queryKey: ['note', noteIdOrNew],
+		queryFn: () => GetNoteById(Number(noteIdOrNew)),
+		enabled: noteIdOrNew !== 'new'
+	});
 
 	// Yeni not oluştururken db'ye ilk kayıt işlemi
 	useEffect(() => {
-		if (noteIdOrNew === 'new' && notePayload) {
-			CreateNote(notePayload)
-				.then(res => {
-					const note = res.data
-					isFromNew.current = true;
-					navigate({ to: `/notes/${note.id}`, replace: true })
-				})
-				.catch(err => console.error("Could not create a new note: ", err))
+		if (noteIdOrNew === 'new' && notePayload && !isCreating.current) {
+			createNoteMutation.mutate(notePayload);
+			isCreating.current = true;
 		}
-	}, [notePayload, noteIdOrNew, navigate])
+	}, [notePayload, noteIdOrNew])
 
-	// Var olan note sayfasına girince çalışıyor
 	useEffect(() => {
-		if (noteIdOrNew === 'new' || isFromNew.current) return;
-		GetNoteById(Number(noteIdOrNew))
-			.then((res) => {
-				setNotePayload({
-					title: res.title || '',
-					content: res.content,
-				})
+		if (note) {
+			setNotePayload({
+				title: note.title || '',
+				content: note.content,
 			})
-			.catch((err) => console.error('Could not fetch note:', err))
-	}, [noteIdOrNew])
-
-	// TODO: DebouncedValue eski gidiyor güncel değil
-	useEffect(() => {
-		return () => {
-			if (debouncedNote && noteIdOrNew !== 'new') {
-				UpdateNoteById(debouncedNote, Number(noteIdOrNew))
-			}
 		}
+	}, [note])
+
+	useEffect(() => {
+		if (debouncedNote && noteIdOrNew !== 'new') updateNoteMutation.mutate({ note: debouncedNote, noteId: Number(noteIdOrNew) })
 	}, [noteIdOrNew, debouncedNote])
 
 	const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {

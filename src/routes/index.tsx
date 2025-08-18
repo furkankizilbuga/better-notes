@@ -5,31 +5,24 @@ import { Separator } from '@/components/ui/separator'
 import { TypographyH1 } from '@/components/ui/typography-h1'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Route as NotesRoute } from '@/routes/notes/$noteIdOrNew'
-import { useEffect, useState } from 'react'
 import type { Note } from '@/types/note'
 import { GetAllNotes } from '@/services/note-service'
+import { useQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/')({
     component: RouteComponent,
 })
 
 function RouteComponent() {
-    const [notes, setNotes] = useState<Note[]>([]);
+    const { data: notes = [] } = useQuery<Note[]>({
+        queryKey: ['notes'],
+        queryFn: GetAllNotes,
+        staleTime: 5 * 60 * 1000
+    })
 
-    useEffect(() => {
-        GetAllNotes()
-            .then((res) => {
-                setNotes(res);
-            })
-            .catch((err) => {
-                console.error(err);
-                setNotes([]);
-            })
-    }, [])
-    
     return (
         <Container className='flex flex-col gap-4 justify-center items-center h-full'>
-            
+
             <Container className='flex flex-col gap-4 items-center'>
                 <TypographyH1>Better Notes</TypographyH1>
                 <Link to={NotesRoute.to} params={{ noteIdOrNew: 'new' }} className='max-w-52 w-full'>
@@ -39,14 +32,20 @@ function RouteComponent() {
                     <Button className='w-full' size={'lg'}>Kısa</Button>
                 </Link>
             </Container>
-            
+
             <Separator></Separator>
-            
+
             <Container className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
                 {
-                    notes.map((note: Note) => (
-                        <NoteCard key={note.id} note={note} />
-                    ))
+                    notes?.length ? (
+                        notes.map((note: Note) => (
+                            <NoteCard key={note.id} note={note} />
+                        ))
+                    )
+                    :
+                    (
+                       "Loading" 
+                    )
                 }
             </Container>
 

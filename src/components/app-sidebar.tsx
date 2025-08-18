@@ -20,7 +20,7 @@ const items = [
   },
   {
     title: "My Notes",
-    path: "/editor",
+    path: "/notes",
     icon: Inbox,
   },
 ]

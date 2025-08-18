@@ -3,8 +3,7 @@ import { createRoot } from 'react-dom/client'
 import '@/styles/globals.css'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { routeTree } from '@/routeTree.gen.ts'
-import { Provider } from 'react-redux'
-import { store } from '@/store'
+import { Providers } from '@/providers/index';
 
 const router = createRouter({ routeTree });
 
@@ -15,13 +14,7 @@ declare module '@tanstack/react-router' {
 }
 
 createRoot(document.getElementById('root')!).render(
-  <Provider store={store}>
+  <Providers>
     <RouterProvider router={router} />
-  </Provider>
+  </Providers>
 )
-
-/* createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
-) */

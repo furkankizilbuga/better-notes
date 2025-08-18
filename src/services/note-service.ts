@@ -35,7 +35,7 @@ export const GetNoteById = async (noteId: number): Promise<Note> => {
         const response = await Axios.get(`/api/notes/${noteId}`);
         return {
             ...response.data,
-            content: JSON.parse(response.data)
+            content: JSON.parse(response.data.content)
         }
     } catch (err) {
         console.error(err);

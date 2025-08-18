@@ -11,6 +11,8 @@ type TProps = {
     note: Note
 }
 
+// TODO: Content'in başları title'da gözükecek eğer title yok ise.
+// card content içerisinde de truncate edilmiş content gösterelim
 export const NoteCard = ({ note }: TProps) => {
     return (
         <Card>
