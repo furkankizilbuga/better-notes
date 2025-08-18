@@ -3,11 +3,10 @@ import {
     NavigationMenuItem,
     NavigationMenuList,
 } from "@/components/ui/navigation-menu"
-import { useCurrentEditor } from "@tiptap/react"
 import { Button } from "./ui/button";
+import { Editor } from '@tiptap/react'
 
-export const EditorMenu = () => {
-    const { editor } = useCurrentEditor();
+export const EditorMenu = ({ editor }: { editor: Editor | null }) => {
     if (!editor) return null;
     return (
         <NavigationMenu>

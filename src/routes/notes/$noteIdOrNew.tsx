@@ -11,7 +11,7 @@ export const Route = createFileRoute('/notes/$noteIdOrNew')({
 	component: RouteComponent,
 })
 
-const AUTO_UPDATE_DELAY = 2000;
+const AUTO_UPDATE_DELAY = 1000;
 
 function RouteComponent() {
 	const { noteIdOrNew } = useParams({ from: '/notes/$noteIdOrNew' })
@@ -47,9 +47,12 @@ function RouteComponent() {
 			.catch((err) => console.error('Could not fetch note:', err))
 	}, [noteIdOrNew])
 
+	// TODO: DebouncedValue eski gidiyor güncel değil
 	useEffect(() => {
 		return () => {
-			if (debouncedNote && noteIdOrNew !== 'new') UpdateNoteById(debouncedNote, Number(noteIdOrNew))
+			if (debouncedNote && noteIdOrNew !== 'new') {
+				UpdateNoteById(debouncedNote, Number(noteIdOrNew))
+			}
 		}
 	}, [noteIdOrNew, debouncedNote])
 
