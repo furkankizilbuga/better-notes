@@ -23,7 +23,7 @@ function RouteComponent() {
 
     const { data: notes = [], isLoading } = useQuery<Note[]>({
         queryKey: ['notes'],
-        queryFn: GetAllNotes,
+        queryFn: () => GetAllNotes({ isShort: false }),
         staleTime: 5 * 60 * 1000
     })
 

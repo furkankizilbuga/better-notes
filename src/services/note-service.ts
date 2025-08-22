@@ -2,9 +2,9 @@ import type { Note, NotePayload, NoteResponse } from "@/types/note";
 import { Axios } from "./base-service"
 import type { AxiosPromise } from "axios";
 
-export const GetAllNotes = async (): Promise<Note[]> => {
+export const GetAllNotes = async ({ isShort = false }: { isShort: boolean}): Promise<Note[]> => {
     try {
-        const response = await Axios.get("/api/notes");
+        const response = await Axios.get(`/api/notes?isShort=${isShort}`);
         return response.data.map((note: NoteResponse) => ({
             ...note,
             content: JSON.parse(note.content)
@@ -19,6 +19,14 @@ export const CreateNote = async (note: NotePayload): AxiosPromise<NoteResponse> 
     return await Axios.post("/api/notes", {
         ...note,
         content: JSON.stringify(note.content)
+    });
+}
+
+export const CreateShortNote = async (note: NotePayload): AxiosPromise<NoteResponse> => {
+    return await Axios.post("/api/notes", {
+        ...note,
+        content: JSON.stringify(note.content),
+        isShort: true
     });
 }
 
