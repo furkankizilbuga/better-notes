@@ -96,7 +96,7 @@ function RouteComponent() {
 
 	return (
 		<Container className='my-4 flex flex-col gap-2' >
-			<Input onClick={() => console.log(debouncedNote)} value={notePayload?.title || ''} onChange={handleTitleChange} />
+			<Input value={notePayload?.title || ''} onChange={handleTitleChange} />
 			<TiptapEditor notePayload={notePayload} setNotePayload={setNotePayload} />
 		</Container >
 	)

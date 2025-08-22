@@ -10,6 +10,7 @@ import type { Note } from "@/types/note";
 
 // TODO: Aktif olan en üstt editable olarak duracak.
 // TODO: scrollArea
+// TODO: Title eklenemiyor, güncellenemiyor.
 export const QuickSidebar = () => {
     const [initialInput, setInitialInput] = useState<string>('');
     const [activeShortNote, setActiveShortNote] = useState<Note | null>(null);
