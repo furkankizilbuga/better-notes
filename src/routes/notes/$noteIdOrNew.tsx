@@ -31,11 +31,13 @@ function RouteComponent() {
 		onSuccess: (res) => {
 			const note = res.data;
 			// TODO: invalidateQueries
+			//queryClient.invalidateQueries({ queryKey: ['notes'] });
 			queryClient.refetchQueries({ queryKey: ['notes'] });
 			navigate({ to: `/notes/${note.id}`, replace: true })
 		}
 	})
 
+	// TODO: Update yapıp ana sayfaya dönünce NoteCard'lar gelmiyor
 	// UpdateNoteById
 	const updateNoteMutation = useMutation({
 		mutationFn: ({ note, noteId }: { note: NotePayload, noteId: number }) => {
@@ -81,13 +83,20 @@ function RouteComponent() {
 		if (debouncedNote && noteIdOrNew !== 'new') updateNoteMutation.mutate({ note: debouncedNote, noteId: Number(noteIdOrNew) })
 	}, [noteIdOrNew, debouncedNote])
 
+	// Sayfadan ayrılırken güncelle
+	useEffect(() => {
+		return () => {
+			if (debouncedNote && noteIdOrNew !== 'new') updateNoteMutation.mutate({ note: debouncedNote, noteId: Number(noteIdOrNew) })
+		}
+	}, [])
+
 	const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
-		if (notePayload) setNotePayload({ ...notePayload, title: e.target.value })
+		setNotePayload({ ...notePayload || {}, title: e.target.value })
 	}
 
 	return (
 		<Container className='my-4 flex flex-col gap-2' >
-			<Input value={notePayload?.title || ''} onChange={handleTitleChange} />
+			<Input onClick={() => console.log(debouncedNote)} value={notePayload?.title || ''} onChange={handleTitleChange} />
 			<TiptapEditor notePayload={notePayload} setNotePayload={setNotePayload} />
 		</Container >
 	)
