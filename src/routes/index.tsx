@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { ChevronDown } from 'lucide-react'
 import { EmptyNoteCard } from '@/components/empty-note-card'
+import { NoteCardSkeleton } from '@/components/skeleton/note-card-skeleton'
 
 export const Route = createFileRoute('/')({
     component: RouteComponent,
@@ -20,14 +21,13 @@ export const Route = createFileRoute('/')({
 function RouteComponent() {
     const [showAll, setShowAll] = useState<boolean>(false);
 
-    const { data: notes = [] } = useQuery<Note[]>({
+    const { data: notes = [], isLoading } = useQuery<Note[]>({
         queryKey: ['notes'],
         queryFn: GetAllNotes,
         staleTime: 5 * 60 * 1000
     })
 
     const [columns, setColumns] = useState<number>(4);
-
     useEffect(() => {
         const updateColumns = () => {
             if (window.innerWidth < 640) setColumns(1);
@@ -59,8 +59,9 @@ function RouteComponent() {
             {/* TODO: Yükseklik arttığında yukarıya doğru yükseliyor. Aşağıya doğru olmalı */}
             <ScrollArea className={`${showAll ? 'h-84' : 'h-40'}`}>
                 <Container className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
+                    {isLoading && Array.from({ length: columns }).map((_, i) => <NoteCardSkeleton key={i} />)}
                     {
-                        visibleNotes?.length ? (
+                        !isLoading && visibleNotes?.length ? (
                             visibleNotes.map((note: Note) => (
                                 <NoteCard key={note.id} note={note} />
                             ))
@@ -75,7 +76,7 @@ function RouteComponent() {
             </ScrollArea>
 
             {
-                visibleNotes?.length >= columns && (
+                !isLoading && visibleNotes?.length >= columns && (
                     <Button
                         onClick={() => setShowAll(prev => !prev)}
                         variant="outline"

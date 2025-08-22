@@ -15,7 +15,7 @@ type TProps = {
 // card content içerisinde de truncate edilmiş content gösterelim
 export const NoteCard = ({ note }: TProps) => {
     return (
-        <Card className="h-40">
+        <Card className="h-40 w-36">
             <CardHeader>
                 <CardTitle>{note.title}</CardTitle>
                 <CardDescription>Card Description</CardDescription>
