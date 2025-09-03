@@ -8,12 +8,12 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './renderer/routes/__root'
-import { Route as ShortNotesRouteImport } from './renderer/routes/short-notes'
-import { Route as NotFoundRouteImport } from './renderer/routes/_not-found'
-import { Route as IndexRouteImport } from './renderer/routes/index'
-import { Route as NotesIndexRouteImport } from './renderer/routes/notes/index'
-import { Route as NotesNoteIdOrNewRouteImport } from './renderer/routes/notes/$noteIdOrNew'
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as ShortNotesRouteImport } from './routes/short-notes'
+import { Route as NotFoundRouteImport } from './routes/_not-found'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as NotesIndexRouteImport } from './routes/notes/index'
+import { Route as NotesNoteIdOrNewRouteImport } from './routes/notes/$noteIdOrNew'
 
 const ShortNotesRoute = ShortNotesRouteImport.update({
   id: '/short-notes',

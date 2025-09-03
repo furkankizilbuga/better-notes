@@ -8,7 +8,8 @@ export default defineConfig({
   plugins: [
     tanstackRouter({
       target: 'react',
-      autoCodeSplitting: true
+      autoCodeSplitting: true,
+      routesDirectory: 'src/renderer/routes'
     }),
     react(),
     tailwindcss()
