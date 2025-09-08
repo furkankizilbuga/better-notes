@@ -2,11 +2,11 @@ import { useState } from "react";
 import { InputWithButton } from "./input-with-button"
 import { NoteCollapsible } from "./note-collapsible"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CreateShortNote, GetAllNotes } from "@/renderer/services/note-service";
 import { Container } from "./ui/container";
 import { stringToJSONContent } from "@/renderer/lib/utils";
 import { NoteCollapsibleSkeleton } from "./skeleton/note-collapsible-skeleton";
 import type { Note } from "@/renderer/types/note";
+import { DataService } from "../services/data-service";
 
 // TODO: Aktif olan en üstt editable olarak duracak.
 // TODO: scrollArea
@@ -18,13 +18,13 @@ export const QuickSidebar = () => {
 
     const { data: shortNotes = [], isLoading } = useQuery({
         queryKey: ['short-notes'],
-        queryFn: () => GetAllNotes({ isShort: true }),
+        queryFn: DataService.GetAllShortNotes,
         staleTime: 5 * 60 * 1000
     });
 
     // CreateShortNote
     const createShortNote = useMutation({
-        mutationFn: CreateShortNote,
+        mutationFn: DataService.CreateShortNote,
         onSuccess: () => {
             setInitialInput('');
             queryClient.refetchQueries({ queryKey: ['short-notes'] });

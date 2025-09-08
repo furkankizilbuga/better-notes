@@ -6,13 +6,13 @@ import { TypographyH1 } from '@/renderer/components/ui/typography-h1'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Route as NotesRoute } from '@/renderer/routes/notes/$noteIdOrNew'
 import type { Note } from '@/renderer/types/note'
-import { GetAllNotes } from '@/renderer/services/note-service'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { ScrollArea } from '@/renderer/components/ui/scroll-area'
 import { ChevronDown } from 'lucide-react'
 import { EmptyNoteCard } from '@/renderer/components/empty-note-card'
 import { NoteCardSkeleton } from '@/renderer/components/skeleton/note-card-skeleton'
+import { DataService } from '@/renderer/services/data-service'
 
 export const Route = createFileRoute('/')({
     component: RouteComponent,
@@ -23,7 +23,7 @@ function RouteComponent() {
 
     const { data: notes = [], isLoading } = useQuery<Note[]>({
         queryKey: ['notes'],
-        queryFn: () => GetAllNotes({ isShort: false }),
+        queryFn: DataService.GetAllNotes,
         staleTime: 5 * 60 * 1000
     })
 

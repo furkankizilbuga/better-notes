@@ -4,7 +4,7 @@ import type { IDataProvider } from "@/renderer/types/data-provider";
 
 let provider: IDataProvider;
 
-if (window.electron.isElectron) {
+if (window.electron?.isElectron) {
     provider = new SqliteProvider();
 } else {
     provider = new ApiProvider();

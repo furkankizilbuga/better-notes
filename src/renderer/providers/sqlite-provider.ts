@@ -1,13 +1,20 @@
 import type { IDataProvider } from "@/renderer/types/data-provider";
-import { CreateNote, GetAllNotes } from "@/main/db/notesDb";
 import type { Note, NotePayload } from "@/renderer/types/note";
 
 export class SqliteProvider implements IDataProvider {
     GetAllNotes = async (): Promise<Note[]> => {
-        return GetAllNotes();
+        return await window.electron.dataService.GetAllNotes();
+    }
+
+    GetAllShortNotes = async (): Promise<Note[]> => {
+        return await window.electron.dataService.GetAllShortNotes();
     }
 
     CreateNote = async (notePayload: NotePayload): Promise<Note> => {
-        return CreateNote(notePayload);
+        return await window.electron.dataService.CreateNote(notePayload);
+    }
+
+    CreateShortNote = async (notePayload: NotePayload): Promise<Note> => {
+        return await window.electron.dataService.CreateShortNote(notePayload);
     }
 }

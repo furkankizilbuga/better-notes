@@ -2,7 +2,8 @@ import TiptapEditor from '@/renderer/components/editor/TiptapEditor'
 import { Container } from '@/renderer/components/ui/container'
 import { Input } from '@/renderer/components/ui/input'
 import { useDebounce } from '@/renderer/hooks/use-debounce'
-import { CreateNote, GetNoteById, UpdateNoteById } from '@/renderer/services/note-service'
+import { DataService } from '@/renderer/services/data-service'
+import { GetNoteById, UpdateNoteById } from '@/renderer/services/note-service'
 import type { Note, NotePayload } from '@/renderer/types/note'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
@@ -27,14 +28,12 @@ function RouteComponent() {
 
 	// CreateNote
 	const createNoteMutation = useMutation({
-		mutationFn: CreateNote,
+		mutationFn: DataService.CreateNote,
 		onSuccess: (res) => {
-			debugger
-			const note = res.data;
 			// TODO: invalidateQueries
 			//queryClient.invalidateQueries({ queryKey: ['notes'] });
 			queryClient.refetchQueries({ queryKey: ['notes'] });
-			navigate({ to: `/notes/${note.id}`, replace: true })
+			navigate({ to: `/notes/${res.id}`, replace: true })
 		}
 	})
 

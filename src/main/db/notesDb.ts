@@ -1,14 +1,24 @@
 import type { Note, NotePayload, NoteResponse } from "@/renderer/types/note";
-import { getDb } from ".";
+import { getDb } from "./index.js";
 import type { NoteSyncResponse } from "@/renderer/types/sync";
 import { v4 as uuidv4 } from "uuid";
-import { JSONContentToString, getLocalDateTime } from "@/renderer/lib/utils";
+import { getLocalDateTime } from "../../renderer/lib/utils.js";
 
 export const GetAllNotes = (): Promise<Note[]> => {
-    debugger
     const db = getDb();
     const notes = db.prepare(`
         SELECT * FROM notes WHERE isDeleted=0
+    `).all();
+    return notes.map((note: NoteResponse) => ({
+        ...note,
+        content: JSON.parse(note.content)
+    }))
+};
+
+export const GetAllShortNotes = (): Promise<Note[]> => {
+    const db = getDb();
+    const notes = db.prepare(`
+        SELECT * FROM notes WHERE isShort=1 AND isDeleted=0
     `).all();
     return notes.map((note: NoteResponse) => ({
         ...note,
@@ -43,8 +53,8 @@ export const CreateNote = (notePayload: NotePayload): Promise<Note> => {
     `).run(externalId, 'create', updatedAt);
     db.prepare(`
         INSERT INTO notes (externalId, title, content, isShort, isDeleted, updatedAt)
-        VALUES (?, ?, ?, ?, ?)
-    `).run(externalId, notePayload.title, notePayload.content, false, false, updatedAt);
+        VALUES (?, ?, ?, ?, ?, ?)
+    `).run(externalId, notePayload.title || '', JSON.stringify(notePayload.content) || '', 0, 0, updatedAt);
 
     return Promise.resolve({
         externalId,
@@ -56,7 +66,7 @@ export const CreateNote = (notePayload: NotePayload): Promise<Note> => {
     });
 };
 
-export const CreateShortNote = (notePayload: NotePayload): Promise<NoteResponse> => {
+export const CreateShortNote = (notePayload: NotePayload): Promise<Note> => {
     const db = getDb();
     const externalId = uuidv4();
     const updatedAt = getLocalDateTime();
@@ -68,19 +78,19 @@ export const CreateShortNote = (notePayload: NotePayload): Promise<NoteResponse>
     db.prepare(`
         INSERT INTO notes (externalId, title, content, isShort, isDeleted, updatedAt)
         VALUES (?, ?, ?, ?, ?)
-    `).run(externalId, notePayload.title, notePayload.content, true, false, updatedAt);
+    `).run(externalId, notePayload.title || '', JSON.stringify(notePayload.content) || '', 1, 0, updatedAt);
 
     return Promise.resolve({
         externalId,
         title: notePayload.title,
-        content: JSONContentToString(notePayload.content),
+        content: notePayload.content,
         isShort: true,
         isDeleted: false,
         updatedAt
     });
 };
 
-export const UpdateNoteByExternalId = (notePayload: NotePayload, externalId: string): Promise<NoteResponse> => {
+export const UpdateNoteByExternalId = (notePayload: NotePayload, externalId: string): Promise<Note> => {
     const db = getDb();
     const updatedAt = getLocalDateTime();
 
@@ -93,12 +103,12 @@ export const UpdateNoteByExternalId = (notePayload: NotePayload, externalId: str
     `).run(externalId, 'update', updatedAt);
     db.prepare(`
         UPDATE notes SET title=?, content=? WHERE externalId=?
-    `).run(notePayload.title, notePayload.content, externalId);
+    `).run(notePayload.title || '', JSON.stringify(notePayload.content) || '', externalId);
 
     return Promise.resolve({
         externalId,
         title: notePayload.title,
-        content: JSONContentToString(notePayload.content),
+        content: notePayload.content,
         isShort: true,
         isDeleted: false,
         updatedAt

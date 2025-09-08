@@ -1,11 +1,15 @@
-import { contextBridge } from 'electron';
+import type { NotePayload } from '@/renderer/types/note';
+import { contextBridge, ipcRenderer } from 'electron';
 
 const electronHandler = {
     isElectron: true,
-    ipcRenderer: {
-
-    }
+    dataService: {
+        GetAllNotes: () => ipcRenderer.invoke('GetAllNotes'),
+        GetAllShortNotes: () => ipcRenderer.invoke('GetAllShortNotes'),
+        CreateNote: (notePayload: NotePayload) => ipcRenderer.invoke('CreateNote', notePayload),
+        CreateShortNote: (notePayload: NotePayload) => ipcRenderer.invoke('CreateShortNote', notePayload)
+    },
 }
 
-contextBridge.exposeInMainWorld("env", electronHandler);
+contextBridge.exposeInMainWorld("electron", electronHandler);
 export type ElectronHandler = typeof electronHandler;

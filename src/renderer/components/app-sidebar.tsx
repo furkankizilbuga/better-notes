@@ -28,7 +28,7 @@ const items = [
 export function AppSidebar() {
   //TODO: Açılış ve kapanış akıcı değil.
   return (
-    <Sidebar onClick={() => console.log(window.env?.isElectron)}>
+    <Sidebar onClick={() => console.log(window.electron?.isElectron)}>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
