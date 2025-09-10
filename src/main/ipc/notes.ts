@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { CreateNote, CreateShortNote, GetAllNotes, GetAllShortNotes, UpdateNoteByExternalId } from "../db/notesDb.js";
+import { CreateNote, CreateShortNote, GetAllNotes, GetAllShortNotes, GetNoteByExternalId, UpdateNoteByExternalId } from "../db/notesDb.js";
 import { NotePayload } from "../../renderer/types/note.js";
 
 ipcMain.handle("GetAllNotes", async () => {
@@ -8,6 +8,10 @@ ipcMain.handle("GetAllNotes", async () => {
 
 ipcMain.handle("GetAllShortNotes", async () => {
     return await GetAllShortNotes();
+});
+
+ipcMain.handle("GetNoteByExternalId", async (_event, externalId: string) => {
+    return await GetNoteByExternalId(externalId);
 });
 
 ipcMain.handle("CreateNote", async (_event, notePayload: NotePayload) => {

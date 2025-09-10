@@ -4,7 +4,6 @@ import { Input } from '@/renderer/components/ui/input'
 import { useDebounce } from '@/renderer/hooks/use-debounce'
 import { stringToJSONContent } from '@/renderer/lib/utils'
 import { DataService } from '@/renderer/services/data-service'
-import { GetNoteByExternalId } from '@/renderer/services/note-service'
 import type { Note, NotePayload } from '@/renderer/types/note'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
@@ -54,7 +53,7 @@ function RouteComponent() {
 	// GetNoteById
 	const { data: note } = useQuery<Note>({
 		queryKey: ['note', noteIdOrNew],
-		queryFn: () => GetNoteByExternalId(noteIdOrNew),
+		queryFn: () => DataService.GetNoteByExternalId(noteIdOrNew),
 		enabled: noteIdOrNew !== 'new'
 	});
 
@@ -67,17 +66,15 @@ function RouteComponent() {
 	}, [notePayload, noteIdOrNew])
 
 	useEffect(() => {
-		if (note) {
-			setNotePayload({
-				title: note.title || '',
-				content: note.content,
-			})
-		}
+		if (!note) return;
+		setNotePayload({
+			title: note.title || '',
+			content: note.content,
+		})
 	}, [note])
 
 	useEffect(() => {
 		if (debouncedNote && noteIdOrNew !== 'new') {
-			console.log("debouncedNote", debouncedNote)
 			updateNoteMutation.mutate({ notePayload: debouncedNote, externalId: noteIdOrNew })
 		}
 	}, [noteIdOrNew, debouncedNote])

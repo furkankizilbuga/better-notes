@@ -6,6 +6,7 @@ const electronHandler = {
     dataService: {
         GetAllNotes: () => ipcRenderer.invoke('GetAllNotes'),
         GetAllShortNotes: () => ipcRenderer.invoke('GetAllShortNotes'),
+        GetNoteByExternalId: (externalId: string) => ipcRenderer.invoke('GetNoteByExternalId', externalId),
         CreateNote: (notePayload: NotePayload) => ipcRenderer.invoke('CreateNote', notePayload),
         CreateShortNote: (notePayload: NotePayload) => ipcRenderer.invoke('CreateShortNote', notePayload),
         UpdateNoteByExternalId: (notePayload: NotePayload, externalId: string) => ipcRenderer.invoke('UpdateNoteByExternalId', notePayload, externalId),

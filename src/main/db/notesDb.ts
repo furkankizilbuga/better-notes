@@ -2,7 +2,7 @@ import type { Note, NotePayload, NoteResponse } from "@/renderer/types/note";
 import { getDb } from "./index.js";
 import type { NoteSyncResponse } from "@/renderer/types/sync";
 import { v4 as uuidv4 } from "uuid";
-import { getLocalDateTime } from "../../renderer/lib/utils.js";
+import { getLocalDateTime, JSONContentToString, stringToJSONContent } from "../../renderer/lib/utils.js";
 
 export const GetAllNotes = (): Promise<Note[]> => {
     const db = getDb();
@@ -26,11 +26,15 @@ export const GetAllShortNotes = (): Promise<Note[]> => {
     }))
 };
 
-export const GetNoteByExternalId = (externalId: string): NoteResponse => {
+export const GetNoteByExternalId = (externalId: string): Promise<Note> => {
     const db = getDb();
-    return db.prepare(`
+    const note = db.prepare(`
         SELECT * FROM notes WHERE externalId=? 
     `).get(externalId);
+    return Promise.resolve({
+        ...note,
+        content: stringToJSONContent(note.content)
+    });
 };
 
 export const GetAllByExternalIds = (externalIds: string[]): NoteResponse[] => {
@@ -114,10 +118,10 @@ export const UpdateNoteByExternalId = (notePayload: NotePayload, externalId: str
     });
 };
 
-export const DeleteNoteByExternalId = (externalId: string): void => {
+export const DeleteNoteByExternalId = async (externalId: string): Promise<void> => {
     const db = getDb();
     const updatedAt = getLocalDateTime();
-    const note = GetNoteByExternalId(externalId);
+    const note = await GetNoteByExternalId(externalId);
 
     db.prepare(`
         INSERT INTO note_changes (externalId, operation, updatedAt)
@@ -128,7 +132,7 @@ export const DeleteNoteByExternalId = (externalId: string): void => {
     `).run(externalId, 'delete', updatedAt);
     db.prepare(`
         UPDATE notes SET title=?, content=? WHERE externalId=?
-    `).run(note.title, note.content, externalId);
+    `).run(note.title, JSONContentToString(note.content), externalId);
 };
 
 // Postgre'den gelen değişiklikleri sqlite notes tablosuna ekler.

@@ -10,6 +10,10 @@ export class SqliteProvider implements IDataProvider {
         return await window.electron.dataService.GetAllShortNotes();
     }
 
+    GetNoteByExternalId = async (externalId: string): Promise<Note> => {
+        return await window.electron.dataService.GetNoteByExternalId(externalId);
+    }
+
     CreateNote = async (notePayload: NotePayload): Promise<Note> => {
         return await window.electron.dataService.CreateNote(notePayload);
     }
