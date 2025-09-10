@@ -10,10 +10,10 @@ import { Separator } from "@/renderer/components/ui/separator"
 import type { Note, NotePayload } from "@/renderer/types/note"
 import { ShortNotePopover } from "./short-note-popover"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { UpdateNoteById } from "@/renderer/services/note-service"
 import { useDebounce } from "@/renderer/hooks/use-debounce"
 import TiptapEditor from "./editor/TiptapEditor"
 import { JSONContentToString } from "@/renderer/lib/utils"
+import { DataService } from '@/renderer/services/data-service'
 
 type TProps = {
     note: Note;
@@ -34,24 +34,19 @@ export const NoteCollapsible = ({ note, activeShortNote, setActiveShortNote }: T
 
     // UpdateShortNote
     const updateShortNote = useMutation({
-        mutationFn: ({ note, noteId }: { note: NotePayload, noteId: number }) => {
-            return UpdateNoteById(note, noteId)
+        mutationFn: ({ notePayload, externalId }: { notePayload: NotePayload, externalId: string }) => {
+            return DataService.UpdateNoteByExternalId(notePayload, externalId)
         },
         onSuccess: (res) => {
-            const updatedNote = res.data;
             queryClient.setQueryData<Note[]>(['short-notes'], (oldNotes = []) => (
-                oldNotes.map(note => (
-                    note.id === updatedNote.id
-                        ? { ...updatedNote, content: JSON.parse(updatedNote.content) }
-                        : note
-                ))
+                oldNotes.map(note => note.externalId === res.externalId ? res : note)
             ))
         }
     })
 
     // Kapanırken demount olmadığı için debounce devam ediyor ve updateliyor. Ekstradan ayrılırken update atmasına gerek yok.
     useEffect(() => {
-        if (debouncedNote) updateShortNote.mutate({ note: debouncedNote, noteId: note.id });
+        if (debouncedNote) updateShortNote.mutate({ notePayload: debouncedNote, externalId: note.externalId });
     }, [debouncedNote])
 
 

@@ -3,6 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import './ipc/notes.js'
 import { initDb } from './db/index.js'
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -56,6 +57,8 @@ function createWindow() {
 
 app.whenReady().then(() => {
 	//startPeriodicSync();
+	const dbPath = path.join(app.getPath('userData'), 'notes.db');
+	if (fs.existsSync(dbPath)) fs.unlinkSync(dbPath);
 	initDb();
 	createWindow();
 })

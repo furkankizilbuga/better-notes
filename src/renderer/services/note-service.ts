@@ -57,7 +57,7 @@ export const CreateShortNote = async (notePayload: NotePayload): Promise<Note> =
 
 };
 
-export const UpdateNoteById = async (note: NotePayload, externalId: string): Promise<Note> => {
+export const UpdateNoteByExternalId = async (note: NotePayload, externalId: string): Promise<Note> => {
     try {
         const response = await Axios.put(`/api/notes?externalId=${externalId}`, {
             externalId,
@@ -75,7 +75,7 @@ export const UpdateNoteById = async (note: NotePayload, externalId: string): Pro
     }
 };
 
-export const GetNoteById = async (externalId: string): Promise<Note> => {
+export const GetNoteByExternalId = async (externalId: string): Promise<Note> => {
     try {
         const response = await Axios.get(`/api/notes?externalId=${externalId}`);
         const { data } = response;

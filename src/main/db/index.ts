@@ -23,7 +23,7 @@ export const initDb = () => {
 
     db.prepare(`
         CREATE TABLE IF NOT EXISTS note_changes (
-            externalId TEXT PRIMARYI KEY,
+            externalId TEXT PRIMARY KEY,
             operation TEXT,
             updatedAt TEXT
         )    

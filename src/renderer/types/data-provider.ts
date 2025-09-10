@@ -5,4 +5,5 @@ export interface IDataProvider {
     GetAllShortNotes(): Promise<Note[]>;
     CreateNote(notePayload: NotePayload): Promise<Note>;
     CreateShortNote(notePayload: NotePayload): Promise<Note>;
+    UpdateNoteByExternalId(notePayload: NotePayload, externalId: string): Promise<Note>;
 }

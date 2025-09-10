@@ -17,4 +17,8 @@ export class SqliteProvider implements IDataProvider {
     CreateShortNote = async (notePayload: NotePayload): Promise<Note> => {
         return await window.electron.dataService.CreateShortNote(notePayload);
     }
+
+    UpdateNoteByExternalId = async (notePayload: NotePayload, externalId: string): Promise<Note> => {
+        return await window.electron.dataService.UpdateNoteByExternalId(notePayload, externalId);
+    }
 }

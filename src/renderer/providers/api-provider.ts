@@ -1,4 +1,4 @@
-import { CreateNote, CreateShortNote, GetAllNotes } from "@/renderer/services/note-service";
+import { CreateNote, CreateShortNote, GetAllNotes, UpdateNoteByExternalId } from "@/renderer/services/note-service";
 import type { IDataProvider } from "@/renderer/types/data-provider";
 import type { Note, NotePayload } from "@/renderer/types/note";
 
@@ -11,11 +11,15 @@ export class ApiProvider implements IDataProvider {
         return await GetAllNotes({ isShort: true });
     }
 
-    CreateNote = async (note: NotePayload): Promise<Note> => {
-        return await CreateNote(note);
+    CreateNote = async (notePayload: NotePayload): Promise<Note> => {
+        return await CreateNote(notePayload);
     }
 
-    CreateShortNote = async (note: NotePayload): Promise<Note> => {
-        return await CreateShortNote(note);
+    CreateShortNote = async (notePayload: NotePayload): Promise<Note> => {
+        return await CreateShortNote(notePayload);
+    }
+
+    UpdateNoteByExternalId = async (notePayload: NotePayload, externalId: string): Promise<Note> => {
+        return await UpdateNoteByExternalId(notePayload, externalId);
     }
 }

@@ -26,7 +26,7 @@ export const GetAllShortNotes = (): Promise<Note[]> => {
     }))
 };
 
-export const GetByExternalId = (externalId: string): NoteResponse => {
+export const GetNoteByExternalId = (externalId: string): NoteResponse => {
     const db = getDb();
     return db.prepare(`
         SELECT * FROM notes WHERE externalId=? 
@@ -93,7 +93,6 @@ export const CreateShortNote = (notePayload: NotePayload): Promise<Note> => {
 export const UpdateNoteByExternalId = (notePayload: NotePayload, externalId: string): Promise<Note> => {
     const db = getDb();
     const updatedAt = getLocalDateTime();
-
     db.prepare(`
         INSERT INTO note_changes (externalId, operation, updatedAt)
         VALUES (?, ?, ?)
@@ -103,11 +102,11 @@ export const UpdateNoteByExternalId = (notePayload: NotePayload, externalId: str
     `).run(externalId, 'update', updatedAt);
     db.prepare(`
         UPDATE notes SET title=?, content=? WHERE externalId=?
-    `).run(notePayload.title || '', JSON.stringify(notePayload.content) || '', externalId);
+    `).run(notePayload?.title || '', JSON.stringify(notePayload.content), externalId);
 
     return Promise.resolve({
         externalId,
-        title: notePayload.title,
+        title: notePayload?.title || "",
         content: notePayload.content,
         isShort: true,
         isDeleted: false,
@@ -118,7 +117,7 @@ export const UpdateNoteByExternalId = (notePayload: NotePayload, externalId: str
 export const DeleteNoteByExternalId = (externalId: string): void => {
     const db = getDb();
     const updatedAt = getLocalDateTime();
-    const note = GetByExternalId(externalId);
+    const note = GetNoteByExternalId(externalId);
 
     db.prepare(`
         INSERT INTO note_changes (externalId, operation, updatedAt)

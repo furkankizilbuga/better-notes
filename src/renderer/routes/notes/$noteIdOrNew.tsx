@@ -2,8 +2,9 @@ import TiptapEditor from '@/renderer/components/editor/TiptapEditor'
 import { Container } from '@/renderer/components/ui/container'
 import { Input } from '@/renderer/components/ui/input'
 import { useDebounce } from '@/renderer/hooks/use-debounce'
+import { stringToJSONContent } from '@/renderer/lib/utils'
 import { DataService } from '@/renderer/services/data-service'
-import { GetNoteById, UpdateNoteById } from '@/renderer/services/note-service'
+import { GetNoteByExternalId } from '@/renderer/services/note-service'
 import type { Note, NotePayload } from '@/renderer/types/note'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
@@ -18,7 +19,7 @@ const AUTO_UPDATE_DELAY = 1000;
 function RouteComponent() {
 	const [notePayload, setNotePayload] = useState<NotePayload | null>(null)
 	const { noteIdOrNew } = useParams({ from: '/notes/$noteIdOrNew' })
- 
+
 	// Hızlı karakter girdiğimizde arka arkada create yapmasın diye flag.
 	const isCreating = useRef(false);
 
@@ -33,24 +34,19 @@ function RouteComponent() {
 			// TODO: invalidateQueries
 			//queryClient.invalidateQueries({ queryKey: ['notes'] });
 			queryClient.refetchQueries({ queryKey: ['notes'] });
-			navigate({ to: `/notes/${res.id}`, replace: true })
+			navigate({ to: `/notes/${res.externalId}`, replace: true })
 		}
 	})
 
 	// TODO: Update yapıp ana sayfaya dönünce NoteCard'lar gelmiyor
 	// UpdateNoteById
 	const updateNoteMutation = useMutation({
-		mutationFn: ({ note, noteId }: { note: NotePayload, noteId: number }) => {
-			return UpdateNoteById(note, noteId)
+		mutationFn: ({ notePayload, externalId }: { notePayload: NotePayload, externalId: string }) => {
+			return DataService.UpdateNoteByExternalId(notePayload, externalId);
 		},
 		onSuccess: (res) => {
-			const updatedNote = res.data;
 			queryClient.setQueryData<Note[]>(['notes'], (oldNotes = []) => (
-				oldNotes.map(note => (
-					note.id === updatedNote.id
-						? { ...updatedNote, content: JSON.parse(updatedNote.content) }
-						: note
-				))
+				oldNotes.map(note => note.externalId === res.externalId ? res : note)
 			))
 		}
 	})
@@ -58,7 +54,7 @@ function RouteComponent() {
 	// GetNoteById
 	const { data: note } = useQuery<Note>({
 		queryKey: ['note', noteIdOrNew],
-		queryFn: () => GetNoteById(Number(noteIdOrNew)),
+		queryFn: () => GetNoteByExternalId(noteIdOrNew),
 		enabled: noteIdOrNew !== 'new'
 	});
 
@@ -80,18 +76,25 @@ function RouteComponent() {
 	}, [note])
 
 	useEffect(() => {
-		if (debouncedNote && noteIdOrNew !== 'new') updateNoteMutation.mutate({ note: debouncedNote, noteId: Number(noteIdOrNew) })
+		if (debouncedNote && noteIdOrNew !== 'new') {
+			console.log("debouncedNote", debouncedNote)
+			updateNoteMutation.mutate({ notePayload: debouncedNote, externalId: noteIdOrNew })
+		}
 	}, [noteIdOrNew, debouncedNote])
 
 	// Sayfadan ayrılırken güncelle
 	useEffect(() => {
 		return () => {
-			if (debouncedNote && noteIdOrNew !== 'new') updateNoteMutation.mutate({ note: debouncedNote, noteId: Number(noteIdOrNew) })
+			if (debouncedNote && noteIdOrNew !== 'new') updateNoteMutation.mutate({ notePayload: debouncedNote, externalId: noteIdOrNew })
 		}
 	}, [])
 
 	const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setNotePayload({ ...notePayload || {}, title: e.target.value })
+		setNotePayload(prev =>
+			prev
+				? { ...prev, title: e.target.value }
+				: { title: e.target.value, content: stringToJSONContent("") }
+		)
 	}
 
 	return (

@@ -63,7 +63,7 @@ function RouteComponent() {
                     {
                         !isLoading && visibleNotes?.length ? (
                             visibleNotes.map((note: Note) => (
-                                <NoteCard key={note.id} note={note} />
+                                <NoteCard key={note.externalId} note={note} />
                             ))
                         )
                         :
