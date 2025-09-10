@@ -1,10 +1,11 @@
 import type { NotePayload } from '@/renderer/types/note';
 import { contextBridge, ipcRenderer } from 'electron';
 
+// TODO: IpcEvent importu fixlenecek.
 const electronHandler = {
     isElectron: true,
     dataService: {
-        GetAllNotes: () => ipcRenderer.invoke('GetAllNotes'),
+        GetAllNotes: () => ipcRenderer.invoke("GetAllNotes"),
         GetAllShortNotes: () => ipcRenderer.invoke('GetAllShortNotes'),
         GetNoteByExternalId: (externalId: string) => ipcRenderer.invoke('GetNoteByExternalId', externalId),
         CreateNote: (notePayload: NotePayload) => ipcRenderer.invoke('CreateNote', notePayload),
