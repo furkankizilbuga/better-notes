@@ -1,6 +1,5 @@
 import type { Note, NotePayload, NoteResponse } from "@/renderer/types/note";
 import { Axios } from "./base-service"
-import { stringToJSONContent } from "@/renderer/lib/utils";
 
 /*
     Direkt backende gidiyorsa externalId orada oluşturuluyor.
@@ -13,7 +12,7 @@ export const GetAllNotes = async ({ isShort = false }: { isShort: boolean }): Pr
         const response = await Axios.get(`/api/notes?isShort=${isShort}`);
         return response.data.map((note: NoteResponse) => ({
             ...note,
-            content: stringToJSONContent(note.content)
+            content: JSON.parse(note.content)
         }))
     } catch (err) {
         console.error(err);
@@ -30,7 +29,7 @@ export const CreateNote = async (notePayload: NotePayload): Promise<Note> => {
         const { data } = response;
         return Promise.resolve({
             ...data,
-            content: stringToJSONContent(data.content)
+            content: JSON.parse(data.content)
         });
     } catch (err) {
         console.error(err);
@@ -48,7 +47,7 @@ export const CreateShortNote = async (notePayload: NotePayload): Promise<Note> =
         const { data } = response;
         return Promise.resolve({
             ...data,
-            content: stringToJSONContent(data.content)
+            content: JSON.parse(data.content)
         });
     } catch (err) {
         console.error(err);
@@ -67,7 +66,7 @@ export const UpdateNoteByExternalId = async (note: NotePayload, externalId: stri
         const { data } = response;
         return Promise.resolve({
             ...data,
-            content: stringToJSONContent(data.content)
+            content: JSON.parse(data.content)
         });
     } catch (err) {
         console.error(err);
@@ -81,7 +80,7 @@ export const GetNoteByExternalId = async (externalId: string): Promise<Note> => 
         const { data } = response;
         return {
             ...data,
-            content: stringToJSONContent(data.content)
+            content: JSON.parse(data.content)
         }
     } catch (err) {
         console.error(err);

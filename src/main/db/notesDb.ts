@@ -2,7 +2,7 @@ import type { Note, NotePayload, NoteResponse } from "@/renderer/types/note";
 import { getDb } from "./index.js";
 import type { NoteSyncResponse } from "@/renderer/types/sync";
 import { v4 as uuidv4 } from "uuid";
-import { getLocalDateTime, JSONContentToString, stringToJSONContent } from "../../renderer/lib/utils.js";
+import { getLocalDateTime } from "../../renderer/lib/utils.js";
 
 export const GetAllNotes = (): Promise<Note[]> => {
     const db = getDb();
@@ -33,7 +33,7 @@ export const GetNoteByExternalId = (externalId: string): Promise<Note> => {
     `).get(externalId);
     return Promise.resolve({
         ...note,
-        content: stringToJSONContent(note.content)
+        content: JSON.parse(note.content)
     });
 };
 
@@ -132,7 +132,7 @@ export const DeleteNoteByExternalId = async (externalId: string): Promise<void> 
     `).run(externalId, 'delete', updatedAt);
     db.prepare(`
         UPDATE notes SET title=?, content=? WHERE externalId=?
-    `).run(note.title, JSONContentToString(note.content), externalId);
+    `).run(note.title, JSON.stringify(note.content), externalId);
 };
 
 // Postgre'den gelen değişiklikleri sqlite notes tablosuna ekler.
