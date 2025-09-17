@@ -25,6 +25,16 @@ export function JSONContentToString(json: JSONContent): string {
     return result.trim()
 }
 
+/**
+ * Verilen metni bir JSONContent yapısına çevirir.
+ * Sadece ilk kez metin girdiğimiz yerlerde kullanılmalı.
+ * (Önemli: Sadece ilk metin girerken kullanılıyor çünkü normalde parse edilecek
+ * bir JSONContent objesi oluyor. Ancak ilk metin girerken hiç olmadığından JSONContent'i
+ * bu şekilde oluşturuyoruz.)
+ * 
+ * @param plainText - JSONContent'e dönüştürülecek düz metin.
+ * @returns JSONContent - Tipi 'doc' olan ve içinde bir 'paragraph' barındıran JSONContent nesnesi.
+ */
 export function stringToJSONContent(plainText: string): JSONContent {
     return {
         type: 'doc',
@@ -51,4 +61,11 @@ export const getLocalDateTime = () => {
     const seconds = String(now.getSeconds()).padStart(2, "0");
 
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+};
+
+export const formatDate = (dateString: string) => {
+    const [datePart, timePart] = dateString.split('T');
+    const [year, month, day] = datePart.split('-');
+    const [hour] = timePart.split('-');
+    return `${day}-${month}-${year} ${hour}`;
 };

@@ -7,17 +7,24 @@ import {
   CardTitle,
 } from "@/renderer/components/ui/card"
 import { Edit2 } from "lucide-react"
+import type { Note } from "@/renderer/types/note"
+import { formatDate, JSONContentToString } from "../lib/utils"
 
-export const ShortNoteCard = () => {
+type TProps = {
+    note: Note
+}
+
+// TODO: Edit butonu
+export const ShortNoteCard = ({ note }: TProps)  => {
     return (
-        <Card className="pointer-events-none select-none">
+        <Card className="pointer-events-none">
             <CardHeader>
-                <CardTitle>Card Title</CardTitle>
-                <CardDescription className='text-xs'>UpdatedAt</CardDescription>
+                <CardTitle>{note?.title || ""}</CardTitle>
+                <CardDescription className='text-xs'>{formatDate(note.updatedAt)}</CardDescription>
                 <CardAction><Edit2 className='w-4 h-4' /></CardAction>
             </CardHeader>
             <CardContent>
-                <p className="truncate">Card ContentAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa</p>
+                <p className="truncate">{JSONContentToString(note.content)}</p>
             </CardContent>
         </Card>
     )

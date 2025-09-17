@@ -1,4 +1,4 @@
-import { Home, Inbox } from "lucide-react"
+import { Home, Inbox, Mail } from "lucide-react"
 import { Link } from "@tanstack/react-router"
 
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/renderer/components/ui/sidebar"
 
 // Menu items.
+// TODO: ikonlar değişecek.
 const items = [
   {
     title: "Home",
@@ -22,6 +23,11 @@ const items = [
     title: "My Notes",
     path: "/notes",
     icon: Inbox,
+  },
+  {
+    title: "My Shorts",
+    path: "/short-notes",
+    icon: Mail,
   },
 ]
 

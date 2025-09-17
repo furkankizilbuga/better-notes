@@ -20,7 +20,7 @@ export const NoteCard = ({ note }: TProps) => {
     const navigate = useNavigate();
     const handleNavigation = () => navigate({ to: `/notes/${note.externalId}`, replace: true });
     return (
-        <Card className="h-40 w-36">
+        <Card className="">
             <CardHeader>
                 <CardTitle>{note.title}</CardTitle>
                 <CardDescription>Card Description</CardDescription>

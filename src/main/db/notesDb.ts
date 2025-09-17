@@ -81,7 +81,7 @@ export const CreateShortNote = (notePayload: NotePayload): Promise<Note> => {
     `).run(externalId, 'create', updatedAt);
     db.prepare(`
         INSERT INTO notes (externalId, title, content, isShort, isDeleted, updatedAt)
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?)
     `).run(externalId, notePayload.title || '', JSON.stringify(notePayload.content) || '', 1, 0, updatedAt);
 
     return Promise.resolve({

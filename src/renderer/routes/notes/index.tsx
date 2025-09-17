@@ -32,7 +32,7 @@ function RouteComponent() {
 	}, [])
 
 	return (
-		<Container className='grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 h-full my-4'>
+		<Container className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4'>
 			{isLoading && Array.from({ length: columns }).map((_, i) => <NoteCardSkeleton key={i} />)}
 			{!isLoading && notes?.map(note => (
 				<NoteCard key={note.id} note={note} />

@@ -5,14 +5,19 @@ import { createFileRoute } from '@tanstack/react-router'
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useState } from 'react';
 import { InputWithButton } from '@/renderer/components/input-with-button';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { DataService } from '@/renderer/services/data-service';
+import { useEffect, useState } from 'react';
+import { ShortNoteCardSkeleton } from '../components/skeleton/short-note-card-skeleton';
+import { stringToJSONContent } from '../lib/utils';
+import type { Note } from '@/renderer/types/note';
 
 export const Route = createFileRoute('/short-notes')({
     component: RouteComponent,
 })
 
-function DraggableShortNoteCard({ id }: { id: number }) {
+function DraggableShortNoteCard({ id, note }: { id: string, note: Note }) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -20,18 +25,39 @@ function DraggableShortNoteCard({ id }: { id: number }) {
     };
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            <ShortNoteCard />
+            <ShortNoteCard note={note} />
         </div>
     );
 }
 
 function RouteComponent() {
-    const [items, setItems] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    const queryClient = useQueryClient();
+    const { data: shortNotes = [], isLoading } = useQuery({
+        queryKey: ['short-notes'],
+        queryFn: DataService.GetAllShortNotes,
+        staleTime: 5 * 60 * 1000
+    });
 
-    function handleDragEnd(event: any) {
+    const [initialInput, setInitialInput] = useState<string>('');
+    const [shortNoteIds, setShortNoteIds] = useState<string[]>([]);
+
+    useEffect(() => {
+        setShortNoteIds(shortNotes.map(i => i.externalId));
+    }, [shortNotes])
+
+    // CreateShortNote
+    const createShortNote = useMutation({
+        mutationFn: DataService.CreateShortNote,
+        onSuccess: () => {
+            setInitialInput('');
+            queryClient.refetchQueries({ queryKey: ['short-notes'] });
+        }
+    })
+
+    const handleDragEnd = (event: any) => {
         const { active, over } = event;
         if (active.id !== over?.id) {
-            setItems((items) => {
+            setShortNoteIds((items) => {
                 const oldIndex = items.indexOf(active.id);
                 const newIndex = items.indexOf(over.id);
                 return arrayMove(items, oldIndex, newIndex);
@@ -39,21 +65,27 @@ function RouteComponent() {
         }
     }
 
-    const handleSendMessage = () => {
-
+    const handleAddShortNote = () => {
+        if (!initialInput) return;
+        createShortNote.mutate({
+            title: '',
+            content: stringToJSONContent(initialInput),
+        })
     }
 
-    // TODO: Notlar alt alta da gelebilir grid de olabilir.
+    // TODO: Dragged position kaydedilmiyor. order gibi bir bilgi lazım.
 
     return (
         <Container>
-            <InputWithButton className='my-4' onClick={handleSendMessage} />
+            <InputWithButton value={initialInput} onChange={(e) => setInitialInput(e.target.value)} onClick={handleAddShortNote} className='my-4' />
             <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={items} strategy={rectSortingStrategy}>
+                <SortableContext items={shortNoteIds} strategy={rectSortingStrategy}>
                     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4'>
-                        {items.map((i) => (
-                            <DraggableShortNoteCard key={i} id={i} />
-                        ))}
+                        {isLoading && Array.from({ length: 9 }).map((_, i) => <ShortNoteCardSkeleton key={i} />)}
+                        {!isLoading && shortNoteIds.map(id => {
+                            const note = shortNotes.find(n => n.externalId === id)!;
+                            return <DraggableShortNoteCard key={id} id={id} note={note} />;
+                        })}
                     </div>
                 </SortableContext>
             </DndContext>

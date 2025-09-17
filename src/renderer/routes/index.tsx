@@ -49,9 +49,6 @@ function RouteComponent() {
                 <Link to={NotesRoute.to} params={{ noteIdOrNew: 'new' }} className='max-w-52 w-full'>
                     <Button className='w-full' size={'lg'}>Yaz</Button>
                 </Link>
-                <Link to='/short-notes' className='max-w-52 w-full'>
-                    <Button className='w-full' size={'lg'}>Kısa</Button>
-                </Link>
             </Container>
 
             <Separator></Separator>

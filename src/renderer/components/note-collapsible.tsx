@@ -23,6 +23,7 @@ type TProps = {
 
 const AUTO_UPDATE_DELAY = 1000;
 
+// TODO: Collapse'e tıklayınca direkt editör açılıyor. Sadece edit butonuna bağlı olmalı.
 // TODO: Menüde gözüken collapsible içerisinde gözüken değerler debounced update sonrası güncelleniyor.
 export const NoteCollapsible = ({ note, activeShortNote, setActiveShortNote }: TProps) => {
     const queryClient = useQueryClient();
